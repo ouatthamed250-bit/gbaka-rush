@@ -83,6 +83,11 @@ function testGoalOnHud() {
     `Niveau 1 / ${LEVELS.length} · ${LEVELS[0].name} — ${LEVELS[0].goal} passagers`,
   );
 
+  // HUD : commune au-dessus, quartier en cours en dessous.
+  ui.setPlace('Yopougon', 'Niangon');
+  assert.equal(node('hud-commune').textContent, 'Yopougon');
+  assert.equal(node('hud-quartier').textContent, 'Niangon');
+
   ui.updateHud({ speed: 40, money: 3500, pax: 4, cap: 8, damage: 12, boarded: 3, goal: LEVELS[0].goal });
   assert.equal(node('hud-goal').textContent, `3/${LEVELS[0].goal}`, 'objectif affiché dans le HUD');
   assert.equal(node('hud-goal-pill').classList.contains('hidden'), false, 'pastille objectif visible');
