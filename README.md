@@ -92,6 +92,7 @@ gbaka-rush/
 │     ├─ people.js         passants sur les trottoirs
 │     ├─ mesh-utils.js     outil pour fusionner des formes 3D (fluidité)
 │     ├─ districts.js      choix des ambiances de rue (ville, marché, quartier, pont)
+│     ├─ sectors.js         secteurs d'Abidjan : quartiers, cris de l'apprenti, HUD
 │     ├─ traffic.js        voitures, camions, motos, bus, embouteillages
 │     └─ world.js          route infinie, immeubles, marché, pont et lagune
 ├─ docs/                   règles du jeu, liste des images à faire, feuille de route, prompt
@@ -101,15 +102,18 @@ gbaka-rush/
 
 ## Ce qui marche déjà
 - Menu, course, pause, fin de partie, **niveaux**, garage (4 améliorations, 6 peintures dont 4 verrouillées), paramètres.
-- **4 niveaux (communes)** : Yopougon, Adjamé, Plateau, Embouteillage. Chacun a un objectif de
-  passagers (10, 12, 14, 16), une prime et un trafic plus dense. Objectif atteint → écran
-  « Niveau réussi » avec le bilan, puis bouton **Niveau suivant**. 100 % de dégâts → on rejoue le
-  même niveau. Après le dernier niveau, la **course libre** se débloque (le trafic s'épaissit avec
-  la distance). La progression est sauvegardée (`src/save.js`, champ `level`). Réglages :
-  `LEVELS` dans `src/config.js`.
+- **5 niveaux = 5 secteurs d'Abidjan** : Yopougon, Adjamé, Plateau, Treichville, Cocody (dans cet
+  ordre). Chacun a ses **quartiers** (Niangon, Siporex... à Yopougon ; Liberté, Williamsville... à
+  Adjamé), son **décor** (palette, façades, horizon, foule, taxis-motos), son objectif de passagers
+  (10, 12, 14, 16, 18), sa prime et un trafic plus dense. Tous les 400 m le gbaka s'arrête dans le
+  quartier suivant : HUD « Yopougon · Niangon », message « Arrêt Niangon : +2 passagers ». Objectif
+  atteint → écran « Niveau réussi » avec le bilan, puis bouton **Niveau suivant**. 100 % de dégâts →
+  on rejoue le même niveau. Après le dernier niveau, la **course libre** se débloque (décor et trafic
+  changent avec la distance). La progression est sauvegardée (`src/save.js`, champ `level`).
+  Réglages : `SECTORS` et `LEVELS` dans `src/config.js`.
 - Un doigt : accélérer, dévier, freiner (délai de grâce de 0,2 s).
 - Fumée noire, secousses, roulis du gbaka, trafic qui s'épaissit par commune, klaxon automatique.
-- **L'apprenti** sort la tête et le bras du gbaka pour crier les destinations (« Adjamé, Adjamé ! », « Yopougon Siporex ! », « Niangon, à gauche, à droite ! », « Adjamé Liberté, par le pont ! »...), puis rentre. Quand le gbaka est plein, il crie « Complet ! ». Les cris sont dans `src/config.js` (`APPRENTI_CRIS`).
+- **L'apprenti** sort la tête et le bras du gbaka pour crier les destinations du **secteur joué** (« Yopougon Niangon ! », « Siporex, Siporex ! », « Adjamé Liberté ! », « Williamsville ! »...). Un arrêt sur deux environ, il appelle le **quartier où le gbaka va s'arrêter** (« Niangon ! Niangon ! »). Quand le gbaka est plein, il crie « Complet ! ». Les cris de chaque commune sont dans `src/config.js` (`SECTORS[i].cries`) : aucun nom d'une autre commune ne sort de sa bouche.
 - **Ville en relief** : immeubles à fenêtres, boutiques avec auvents, balcons, trottoirs surélevés, lampadaires, poteaux et fils électriques, palmiers, étals de marché avec parasols, panneaux, passages piétons, ralentisseurs, grandes tours au fond et silhouette lointaine d'Abidjan.
 - **Quartiers qui défilent** : la rue change d'ambiance tous les 48 m — la ville, le **marché de rue** (étals, parasols, vendeuses, hangar, banderoles), le **quartier d'habitation** (murs, cours, linge qui sèche, maquis) et le **pont au-dessus de la lagune Ébrié** (rambardes, lampadaires, pirogues et pêcheurs sur l'eau). Le nom du quartier s'affiche quand on y entre (réglages : `DISTRICTS` dans `src/config.js`).
 - **Trafic varié** : taxis compteurs, woro-woro, berlines, minibus, camions, motos avec passager, un autre gbaka, pick-up bâché et le bus bleu de la Sotra.

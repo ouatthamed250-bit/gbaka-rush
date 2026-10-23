@@ -28,27 +28,35 @@ roule alors le plus loin possible.
 - Chaque choc ajoute des dégâts (6 + 1,6 x vitesse relative). À 100 %, la course est finie : le niveau est raté.
 - Après un choc : 0,9 s d'invulnérabilité, secousse de caméra, vibration du téléphone.
 
-## Niveaux
-Un niveau = une commune = une course. L'objectif s'affiche dans le HUD (pastille verte) et dans la pause.
+## Niveaux = secteurs d'Abidjan
+Un niveau = **un secteur** = une course. On fait le tour d'Abidjan dans l'ordre :
+**Yopougon → Adjamé → Plateau → Treichville → Cocody**. Les communes ne se mélangent jamais :
+le décor, la foule, les taxis-motos et les cris de l'apprenti sont ceux du secteur joué.
+L'objectif s'affiche dans le HUD (pastille verte) et dans la pause.
 
-| Niveau | Commune | Objectif | Prime | Trafic | Vitesse des autres |
-|---|---|---|---|---|---|
-| 1 | Yopougon | 10 passagers | 2 500 FCFA | léger | 9 à 14 m/s |
-| 2 | Adjamé | 12 passagers | 4 000 FCFA | moyen | 7 à 13 m/s |
-| 3 | Plateau | 14 passagers | 6 000 FCFA | dense | 5 à 12 m/s |
-| 4 | Embouteillage | 16 passagers | 9 000 FCFA | très dense | 2 à 9 m/s |
+| Niveau | Commune | Quartiers | Objectif | Prime | Trafic | Vitesse des autres |
+|---|---|---|---|---|---|---|
+| 1 | Yopougon | Niangon, Siporex, Sicogi, Selmer, Toits Rouges, Ananeraie | 10 passagers | 2 500 FCFA | léger | 9 à 14 m/s |
+| 2 | Adjamé | Liberté, Williamsville, Bromakoté, Bracodi, Gare routière | 12 passagers | 4 000 FCFA | moyen | 7 à 13 m/s |
+| 3 | Plateau | Cité Administrative, Indénié, Dokui, Cathédrale | 14 passagers | 6 000 FCFA | dense | 5 à 12 m/s |
+| 4 | Treichville | Zone 3, Arras, Belleville, Le Port | 16 passagers | 9 000 FCFA | très dense | 4 à 11 m/s |
+| 5 | Cocody | Angré, Deux-Plateaux, Riviera, Danga | 18 passagers | 13 000 FCFA | embouteillage | 3 à 10 m/s |
 
+- À chaque **arrêt** (tous les 400 m), le gbaka change de **quartier** : le HUD affiche
+  « Yopougon · Niangon », le message annonce « Arrêt Niangon : +2 passagers » et l'apprenti
+  appelle le quartier suivant. On fait le tour des quartiers du secteur, puis on recommence.
 - Objectif atteint : la course s'arrête, l'argent de la course est encaissé, la prime est versée et
   l'écran « Niveau réussi » propose le **niveau suivant**. Le niveau suivant est alors débloqué
   (progression sauvegardée).
 - 100 % de dégâts (ou « Terminer la course ») : le niveau est raté, « Rejouer » relance le même niveau.
-- Après le 4e niveau : **course libre**. Plus d'objectif ; la commune change avec la distance
-  parcourue et le trafic s'épaissit (2 000 m, 5 000 m, 9 000 m). Le record de distance continue.
+- Après le 5e niveau : **course libre**. Plus d'objectif ; la commune (et donc le décor) change avec la
+  distance parcourue et le trafic s'épaissit (2 000 m, 5 000 m, 9 000 m, 14 000 m). Le record continue.
 - Un niveau déjà réussi ne peut pas être reperdu : rejouer un ancien niveau ne fait jamais reculer
   la progression.
 - Règle de sécurité : il reste toujours une voie libre au moment où une voiture apparaît.
-- Réglages : `LEVELS` dans `src/config.js`. Règles pures et testables : `src/game/levels.js`
-  (vérifiées par `tests/levels.mjs`).
+- Réglages : `SECTORS` et `LEVELS` dans `src/config.js`. Règles pures et testables :
+  `src/game/sectors.js` (quartiers, cris, HUD) et `src/game/levels.js` (progression), vérifiées par
+  `tests/sectors.mjs` et `tests/levels.mjs`.
 
 ## Décor
 - La rue est découpée en tronçons de 48 m. Chacun reçoit une ambiance : ville (environ la moitié des

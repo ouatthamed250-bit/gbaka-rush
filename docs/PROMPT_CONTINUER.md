@@ -26,10 +26,10 @@ Lance `npm install` puis `npm run dev`, vérifie que le jeu démarre, et dis-moi
 
 Étape C : **décor d'Abidjan**
 1. (fait) Morceaux de rue modulaires : ville, marché de rue, quartier d'habitation et pont au-dessus de la lagune, chacun en 2 à 6 variantes **fusionnées en un seul maillage** (une variante = 2 appels de dessin, moins qu'avec des instances). Le choix se règle dans `DISTRICTS` (`src/config.js`) et se vérifie avec `tests/world.mjs`.
-2. (à faire) Variation par commune (couleurs, décor) et passage de jour à nuit.
+2. (fait) Variation par commune : chaque secteur a sa palette, ses façades, son horizon, sa foule et ses taxis-motos (`SECTORS` dans `src/config.js`, styles dans `src/game/world.js`). Reste à faire : la nuit et la pluie.
 
-Étape C bis : **les niveaux** (fait)
-1. (fait) Quatre niveaux (communes) avec un objectif de passagers, une prime, un écran « Niveau réussi » et le bouton « Niveau suivant ». 100 % de dégâts = on rejoue le même niveau. Après le dernier niveau : course libre. Réglages dans `LEVELS` (`src/config.js`), règles dans `src/game/levels.js`, tests dans `tests/levels.mjs` (règles) et `tests/game-flow.mjs` (parcours complet avec un faux DOM).
+Étape C bis : **les niveaux = secteurs** (fait)
+1. (fait) Cinq niveaux, un par commune (Yopougon, Adjamé, Plateau, Treichville, Cocody), avec un objectif de passagers, une prime, un écran « Niveau réussi » et le bouton « Niveau suivant ». 100 % de dégâts = on rejoue le même niveau. Après le dernier niveau : course libre. Chaque commune a ses quartiers : les arrêts changent de quartier, l'apprenti les appelle et le HUD affiche « Commune · Quartier ». Réglages dans `SECTORS` et `LEVELS` (`src/config.js`), règles dans `src/game/sectors.js` et `src/game/levels.js`, tests dans `tests/sectors.mjs`, `tests/levels.mjs` et `tests/game-flow.mjs` (parcours complet avec un faux DOM).
 2. (à faire) Carte des niveaux (rejouer un niveau déjà réussi) et missions du jour branchées sur les niveaux.
 
 Étape D : **son**

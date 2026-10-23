@@ -9,9 +9,20 @@ import { Traffic } from './traffic.js';
 import { People } from './people.js';
 import { carHitsPlayer } from './rules.js';
 import { levelAt, levelIndex, allDone, goalReached, communeForDistance, bankLevelWin, bankRunLoss } from './levels.js';
+import { sectorOfLevel, quartierAt, stopLabel } from './sectors.js';
 import { FpsMeter } from '../perf.js';
 
 const _v = new THREE.Vector3();
+
+// Lumière de chaque commune : soleil plus blanc et plus franc au Plateau, plus chaud et plus
+// bas à Yopougon et Adjamé, lumière verte sous les arbres de Cocody.
+const LIGHTING = {
+  yopougon: { sun: 0.9, sunColor: 0xfff0cc, hemi: 1.3, sky: 0xffffff, ground: 0xc08a55, angle: 0 },
+  adjame: { sun: 0.95, sunColor: 0xffe9c0, hemi: 1.22, sky: 0xfff4e0, ground: 0xa8794f, angle: 1 },
+  plateau: { sun: 1.05, sunColor: 0xfff8e8, hemi: 1.12, sky: 0xdcefff, ground: 0x9b9b92, angle: 2 },
+  treichville: { sun: 0.88, sunColor: 0xffeccc, hemi: 1.2, sky: 0xe6eef0, ground: 0x9d8a6a, angle: 3 },
+  cocody: { sun: 1.0, sunColor: 0xfff6d8, hemi: 1.32, sky: 0xe8fff2, ground: 0x8f9c6a, angle: 4 },
+};
 
 export const skinById = (id) => SKINS.find((s) => s.id === id) || SKINS[0];
 
@@ -37,10 +48,11 @@ export class Game {
     this.renderer.setClearColor(0x000000, 0);
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, 1, 0.1, 230);
-    this.scene.add(new THREE.HemisphereLight(0xffffff, 0xc08a55, 1.25));
-    const sun = new THREE.DirectionalLight(0xfff1d0, 0.85);
-    sun.position.set(-20, 40, 30);
-    this.scene.add(sun);
+    this.hemi = new THREE.HemisphereLight(0xffffff, 0xc08a55, 1.25);
+    this.scene.add(this.hemi);
+    this.sun = new THREE.DirectionalLight(0xfff1d0, 0.85);
+    this.sun.position.set(-20, 40, 30);
+    this.scene.add(this.sun);
 
     this.loader = new THREE.TextureLoader();
     this.world = new World(this.scene);
@@ -60,6 +72,10 @@ export class Game {
     this.endless = false; // course libre (après le dernier niveau)
     this.invuln = 0; this.shake = 0; this.honkCd = 0;
     this.district = 'ville';
+    this.sector = null; // commune jouée (SECTORS) : décor, foule, cris de l'apprenti
+    this.quartier = ''; // quartier du prochain arrêt
+    this.stopIndex = 0;
+    this._apprenti = null; // apprenti déjà mis au courant de la commune (voir _syncApprenti)
 
     this.applyQuality();
     window.addEventListener('resize', () => this.resize());
@@ -121,6 +137,46 @@ export class Game {
     this.camera.lookAt(0, -0.6, 0);
   }
 
+  // ---------- Commune (secteur) ----------
+  // Applique la commune du niveau : décor (world), foule (people), trafic (motos), cris de
+  // l'apprenti, lumière et HUD. Le premier arrêt du niveau est dans son premier quartier.
+  _useSector(index) {
+    const sector = sectorOfLevel(index);
+    this.world.setSector(sector);
+    this.world.applyEnvironment(this.scene);
+    this.people.setSector(sector, this.z);
+    this.traffic.setSector(sector);
+    this.sector = sector;
+    this.stopIndex = 0;
+    this.quartier = quartierAt(sector, 0);
+    this._apprenti = null; // le gbaka a pu reconstruire son apprenti : on le remet au courant
+    this._syncApprenti();
+    this.ui.setPlace(sector.name, this.quartier);
+    this._applySectorLight(sector);
+    return sector;
+  }
+
+  // Le gbaka reconstruit son apprenti à chaque changement de peinture (et quand le vrai modèle
+  // 3D finit de charger) : cet apprenti neuf doit récupérer la commune et le quartier en cours,
+  // sinon il se remettrait à crier des destinations génériques.
+  _syncApprenti() {
+    const a = this.gbaka?.apprenti;
+    if (!a || a === this._apprenti) return;
+    this._apprenti = a;
+    a.setSector(this.sector);
+    a.setQuartier(this.quartier);
+  }
+
+  _applySectorLight(sector) {
+    const l = LIGHTING[sector?.look] || LIGHTING.yopougon;
+    this.sun.intensity = l.sun;
+    this.sun.color.set(l.sunColor);
+    this.sun.position.set(-24 + l.angle * 7, 40 + l.angle * 2, 30 - l.angle * 4);
+    this.hemi.intensity = l.hemi;
+    this.hemi.color.set(l.sky);
+    this.hemi.groundColor.set(l.ground);
+  }
+
   // ---------- Garage ----------
   openGarage() {
     this.mode = 'garage';
@@ -152,11 +208,15 @@ export class Game {
     const level = levelAt(this.levelIndex);
     this.stats = playerStats(this.save);
     this._playVisuals();
+    // Commune du niveau : décor, foule, taxis-motos, lumière et cris de l'apprenti changent ici.
+    this._useSector(this.levelIndex);
     this.world.reset();
     this.traffic.reset();
     this.people.reset(0);
     this.smoke.clear();
     this.gbaka.setSkin(skinById(d.skin));
+    // La peinture reconstruit le gbaka (et son apprenti) : on lui redonne la commune du niveau.
+    this._syncApprenti();
     this.gbaka.group.rotation.set(0, 0, 0);
     this.x = 0; this.z = 0; this.speed = 0; this.camX = 0;
     this.damage = 0; this.runMoney = 0;
@@ -169,7 +229,7 @@ export class Game {
     this.input.reset();
     this.mode = 'playing';
     this.perf.reset();
-    this.ui.setCommune(level.name);
+    this.ui.setPlace(level.name, this.quartier);
     this.ui.setPauseGoal(this._goalText());
     this.ui.show('hud');
     this.ui.toast(
@@ -301,12 +361,13 @@ export class Game {
     const dist = -this.z;
 
     // Commune : en course libre, le trafic s'épaissit avec la distance ; sinon c'est le niveau joué.
+    // En course libre, on change aussi de décor (et de quartiers) en entrant dans la commune.
     if (this.endless) {
       const li = communeForDistance(dist);
       if (li !== this.levelIndex) {
         this.levelIndex = li;
-        this.ui.toast(LEVELS[li].name);
-        this.ui.setCommune(LEVELS[li].name);
+        this._useSector(li);
+        this.ui.toast(`Bienvenue à ${this.sector.name}`);
       }
     }
     const level = levelAt(this.levelIndex);
@@ -345,16 +406,26 @@ export class Game {
       }
     }
 
-    // Arrêts de gbaka : des passagers descendent et montent
+    // Arrêts de gbaka : des passagers descendent et montent. À chaque arrêt, on change de
+    // quartier du secteur : l'apprenti appelle celui où le gbaka va s'arrêter maintenant.
     if (dist >= this.nextCheckpoint) {
       this.nextCheckpoint += CHECKPOINT_EVERY;
+      const arrived = this.quartier;
       const leave = Math.min(this.passengers, Math.floor(Math.random() * 3));
       const board = 1 + Math.floor(Math.random() * 3);
       const after = Math.min(st.capacity, this.passengers - leave + board);
       const gained = Math.max(0, after - (this.passengers - leave));
       this.passengers = after;
       this.boarded += gained;
-      this.ui.toast(gained > 0 ? `Arrêt ! +${gained} passager${gained > 1 ? 's' : ''}` : 'Arrêt ! Gbaka plein');
+      this.stopIndex += 1;
+      this.quartier = quartierAt(this.sector, this.stopIndex);
+      this.gbaka.apprenti?.setQuartier(this.quartier);
+      this.ui.setPlace(this.sector.name, this.quartier);
+      this.ui.toast(
+        gained > 0
+          ? `${stopLabel(arrived)} : +${gained} passager${gained > 1 ? 's' : ''}`
+          : `${stopLabel(arrived)} : gbaka plein`,
+      );
     }
 
     // Objectif du niveau atteint : on termine ici (bilan, prime, niveau suivant).
@@ -387,6 +458,7 @@ export class Game {
       this.camera.updateProjectionMatrix();
     }
 
+    this._syncApprenti();
     this._updateBubble();
     this.sound.update(this.speed / st.maxSpeed, throttle ? 1 : 0, true);
     this.ui.updateHud({

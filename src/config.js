@@ -95,17 +95,116 @@ export const UPGRADES = {
 };
 export const upgradeCost = (level) => 2000 * (level + 1);
 
-// Niveaux = communes. Chaque niveau est une course avec un objectif :
+// ---------- Secteurs d'Abidjan (les niveaux) ----------
+// Chaque niveau = UN secteur, dans l'ordre du tour d'Abidjan :
+// Yopougon → Adjamé → Plateau → Treichville → Cocody.
+//
+// Règles tenues par npm test (tests/sectors.mjs) :
+//   - deux secteurs ne partagent JAMAIS un quartier : l'apprenti n'appelle que les
+//     quartiers du secteur joué, et le décor change complètement d'un niveau à l'autre ;
+//   - `mix` donne les ambiances traversées dans le secteur (la somme doit faire 1) :
+//     ville (rue commerçante), marche, quartier (rues d'habitation), pont (lagune).
+//     Un secteur sans pont met `pont: 0` : aucun décor de lagune ne s'affiche.
+//   - `people` = passants visibles, `motos` = les taxis-motos circulent dans ce secteur.
+// `look` choisit la palette et les bâtiments dans src/game/world.js (STYLES).
+export const SECTORS = [
+  {
+    id: 'yopougon',
+    name: 'Yopougon',
+    look: 'yopougon',
+    quartiers: ['Niangon', 'Siporex', 'Sicogi', 'Selmer', 'Toits Rouges', 'Ananeraie'],
+    // La plus grande commune d'Abidjan : beaucoup de rues d'habitation et de maquis.
+    mix: { ville: 0.3, marche: 0.25, quartier: 0.45, pont: 0 },
+    people: 32,
+    motos: true,
+    cries: [
+      'Yopougon Niangon !',
+      'Siporex, Siporex !',
+      'Sicogi, Selmer !',
+      'Toits Rouges, direct !',
+      'Ananeraie, Ananeraie !',
+      'Yopougon, Yopougon !',
+    ],
+  },
+  {
+    id: 'adjame',
+    name: 'Adjamé',
+    look: 'adjame',
+    quartiers: ['Liberté', 'Williamsville', 'Bromakoté', 'Bracodi', 'Gare routière'],
+    // Le marché d'Abidjan : rue commerçante et marché collés, foule dense.
+    mix: { ville: 0.45, marche: 0.4, quartier: 0.15, pont: 0 },
+    people: 44,
+    motos: true,
+    cries: [
+      'Adjamé Liberté !',
+      'Williamsville, Williamsville !',
+      'Bromakoté, Bracodi !',
+      'La gare routière !',
+      'Adjamé, Adjamé !',
+    ],
+  },
+  {
+    id: 'plateau',
+    name: 'Plateau',
+    look: 'plateau',
+    quartiers: ['Cité Administrative', 'Indénié', 'Dokui', 'Cathédrale'],
+    // Le centre d'affaires : tours, grands trottoirs, peu de marché.
+    mix: { ville: 0.65, marche: 0.1, quartier: 0.15, pont: 0.1 },
+    people: 26,
+    motos: false,
+    cries: [
+      'Plateau, Plateau !',
+      'Cité Administrative !',
+      'Indénié, direct !',
+      'Dokui, par le pont !',
+    ],
+  },
+  {
+    id: 'treichville',
+    name: 'Treichville',
+    look: 'treichville',
+    quartiers: ['Zone 3', 'Arras', 'Belleville', 'Le Port'],
+    // Le port : entrepôts, conteneurs, camions et rues basses.
+    mix: { ville: 0.4, marche: 0.2, quartier: 0.25, pont: 0.15 },
+    people: 34,
+    motos: true,
+    cries: [
+      'Treichville, Treichville !',
+      'Zone 3 !',
+      'Arras, Belleville !',
+      'Le Port, le Port !',
+    ],
+  },
+  {
+    id: 'cocody',
+    name: 'Cocody',
+    look: 'cocody',
+    quartiers: ['Angré', 'Deux-Plateaux', 'Riviera', 'Danga'],
+    // Les résidences et les villas de l'Est : vert, calme, grosses voitures.
+    mix: { ville: 0.45, marche: 0.1, quartier: 0.4, pont: 0.05 },
+    people: 24,
+    motos: false,
+    cries: [
+      'Cocody Angré !',
+      'Deux-Plateaux, Deux-Plateaux !',
+      'Riviera, Riviera !',
+      'Danga, direct !',
+    ],
+  },
+];
+
+// Niveaux = secteurs. Chaque niveau est une course avec un objectif :
 // transporter `goal` passagers (comptés à la montée, même s'ils descendent ensuite).
 // Objectif atteint => le niveau est réussi : prime `reward`, écran de bilan, niveau suivant.
 // 100 % de dégâts => niveau raté, on rejoue le même.
 // `from` ne sert qu'à la course libre (après le dernier niveau) : le trafic s'épaissit avec la distance.
 // Les objectifs et les primes se règlent ici (voir docs/GAME_DESIGN.md).
 export const LEVELS = [
-  { name: 'Yopougon', from: 0, goal: 10, reward: 2500, density: 0.35, carSpeed: [9, 14] },
-  { name: 'Adjamé', from: 2000, goal: 12, reward: 4000, density: 0.5, carSpeed: [7, 13] },
-  { name: 'Plateau', from: 5000, goal: 14, reward: 6000, density: 0.7, carSpeed: [5, 12] },
-  { name: 'Embouteillage', from: 9000, goal: 16, reward: 9000, density: 0.95, carSpeed: [2, 9] },
+  { name: 'Yopougon', sector: 0, from: 0, goal: 10, reward: 2500, density: 0.35, carSpeed: [9, 14] },
+  { name: 'Adjamé', sector: 1, from: 2000, goal: 12, reward: 4000, density: 0.5, carSpeed: [7, 13] },
+  { name: 'Plateau', sector: 2, from: 5000, goal: 14, reward: 6000, density: 0.7, carSpeed: [5, 12] },
+  { name: 'Treichville', sector: 3, from: 9000, goal: 16, reward: 9000, density: 0.85, carSpeed: [4, 11] },
+  { name: 'Cocody', sector: 4, from: 14000, goal: 18, reward: 13000, density: 0.95, carSpeed: [3, 10] },
 ];
 
 // Peintures du gbaka. unlockKm = distance cumulée pour débloquer (à tester).
@@ -125,19 +224,10 @@ export const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
 
 // Cris de l'apprenti (il sort la tête et le bras du gbaka pour appeler les passagers).
-export const APPRENTI_CRIS = [
-  'Adjamé, Adjamé !',
-  'Yopougon Siporex !',
-  'Niangon, à gauche, à droite !',
-  'Adjamé Liberté, par le pont !',
-  'Plateau, Plateau, direct !',
-  'Abobo Gare, Abobo Gare !',
-  'Yopougon Sicogi, Yopougon Maroc !',
-  'Treichville, Marcory, Koumassi !',
-  'Cocody Danga, Angré !',
-  'Adjamé Williamsville !',
-  'Port-Bouët, Aéroport !',
-  'Bingerville, Bingerville !',
-  'Il y a place, il y a place !',
-];
+// Les destinations sont dans SECTORS[i].cries : il n'appelle QUE les quartiers du secteur joué.
+// Ces deux listes servent de secours quand le secteur n'a pas de cri (course libre, tests).
+export const APPRENTI_CRIS = ['Il y a place, il y a place !', 'On y va, on y va !'];
 export const APPRENTI_CRIS_PLEIN = ["C'est plein, prochain gbaka !", 'Complet, complet !'];
+
+// Appel d'un arrêt : « Niangon ! Niangon ! » (le quartier où le gbaka s'arrête).
+export const APPRENTI_CRIS_ARRET = (quartier) => `${quartier} ! ${quartier} !`;

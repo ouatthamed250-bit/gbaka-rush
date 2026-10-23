@@ -309,7 +309,7 @@ try {
   testDistricts();
   console.log('\n--- Trafic : 5 minutes ---');
   run({ label: 'Parcours normal (5 min)', minutes: 5, speed: 20 });
-  run({ label: 'Embouteillage (5 min)', minutes: 5, speed: 10, forcedLevel: 3 });
+  run({ label: 'Treichville, trafic dense (5 min)', minutes: 5, speed: 10, forcedLevel: 3 });
   console.log('\n--- Qualité éco ---');
   testEco();
   console.log('\nTous les tests passent.');

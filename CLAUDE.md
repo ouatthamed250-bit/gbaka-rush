@@ -5,7 +5,7 @@ Réponds en **français simple**, par petites étapes, et dis clairement ce qui 
 
 ## Règles du jeu à respecter
 - Format **vertical** (portrait). Commande à **un seul doigt** : appuyer = accélérer, glisser = dévier, lever le doigt = freiner. **Jamais** de boutons gauche/droite.
-- Caméra derrière le gbaka. Route à 3 voies avec accotements. Trafic de plus en plus dense par commune (Yopougon, Adjamé, Plateau, Embouteillage).
+- Caméra derrière le gbaka. Route à 3 voies avec accotements. Trafic de plus en plus dense par commune (Yopougon, Adjamé, Plateau, Treichville, Cocody). Chaque commune a son décor et ses quartiers : rien ne se mélange.
 - Conduite **arcade**, pas réaliste. 3D **low-poly** stylisé, couleurs plates.
 - Interface en français. Palette : lagune #00A8E8, latérite #FF7A00, taxi #FFD140, océan #0D2B6B, nature #16A34A, route #2D2D2D. Police : Montserrat.
 

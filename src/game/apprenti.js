@@ -1,8 +1,11 @@
 import * as THREE from 'three';
-import { APPRENTI_CRIS, APPRENTI_CRIS_PLEIN } from '../config.js';
+import { APPRENTI_CRIS_PLEIN, APPRENTI_CRIS_ARRET } from '../config.js';
+import { criesFor, pickCry } from './sectors.js';
 
 // L'apprenti du gbaka : il sort la tête et le bras par la porte, crie une destination, puis rentre.
 // Il est collé à la caisse du gbaka (parent = gbaka.inner), côté droit (porte coulissante).
+// Il n'appelle QUE les quartiers de la commune jouée (setSector / setQuartier) : c'est lui qui
+// fait vivre le secteur à l'écran, avec un cri différent tous les deux ou trois arrêts.
 
 const mat = (c) => new THREE.MeshLambertMaterial({ color: c });
 const ease = (o) => o * o * (3 - 2 * o);
@@ -53,15 +56,36 @@ export class Apprenti {
     this.showing = false;
     this.sweep = false;
     this.lastIdx = -1;
+    this.sector = null;
+    this.quartier = '';
+    this.cries = criesFor(null);
     this.group.visible = false;
   }
 
+  // Commune jouée : ses quartiers et ses cris (aucun nom d'une autre commune ne sort d'ici).
+  setSector(sector) {
+    this.sector = sector;
+    this.cries = criesFor(sector, this.quartier);
+    this.lastIdx = -1;
+  }
+
+  // Quartier du prochain arrêt : l'apprenti le crie en sortant la tête.
+  setQuartier(name) {
+    this.quartier = name || '';
+    this.cries = criesFor(this.sector, this.quartier);
+  }
+
   _pick(full) {
-    const list = full ? APPRENTI_CRIS_PLEIN : APPRENTI_CRIS;
-    let i = Math.floor(Math.random() * list.length);
-    if (list.length > 1 && i === this.lastIdx) i = (i + 1) % list.length;
-    this.lastIdx = i;
-    return list[i];
+    if (full) {
+      const r = pickCry(APPRENTI_CRIS_PLEIN, this.lastIdx);
+      this.lastIdx = r.index;
+      return r.text;
+    }
+    // Une fois sur deux, il appelle directement le quartier où le gbaka va s'arrêter.
+    if (this.quartier && Math.random() < 0.45) return APPRENTI_CRIS_ARRET(this.quartier);
+    const r = pickCry(this.cries, this.lastIdx);
+    this.lastIdx = r.index;
+    return r.text;
   }
 
   // full : le gbaka est plein (il crie alors "Complet !")

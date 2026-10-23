@@ -100,7 +100,18 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .hud .pill small { font-size: 10px; }
 }
 .pill.speed b { font-size: 24px; line-height: 1; }
-.pill.commune { background: var(--taxi); color: var(--ocean); }
+.pill.commune {
+  background: var(--taxi); color: var(--ocean);
+  flex-direction: column; justify-content: center; gap: 1px;
+  height: 46px; padding: 0 14px; line-height: 1.05;
+}
+.pill.commune small { font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.75; }
+.pill.commune b { font-size: 15px; font-weight: 800; max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 360px) {
+  .pill.commune { height: 42px; padding: 0 9px; }
+  .pill.commune b { font-size: 14px; }
+  .pill.commune small { font-size: 9px; }
+}
 .pill.goal { background: var(--nature); }
 .damage { display: flex; align-items: center; gap: 10px; width: min(62vw, 260px); padding: 8px 14px; border-radius: 999px; background: rgba(13,43,107,.82); }
 .damage small { font-weight: 700; font-size: 12px; }

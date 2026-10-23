@@ -90,6 +90,12 @@ export class UI {
   setCommune(name) {
     $('hud-commune').textContent = name;
   }
+  // Commune + quartier courant : la commune en petit au-dessus, le quartier en gros en dessous.
+  setPlace(commune, quartier) {
+    this.setCommune(commune);
+    const el = $('hud-quartier');
+    if (el) el.textContent = quartier || '';
+  }
   updateHud(v) {
     const c = this.cache;
     if (c.speed !== v.speed) $('hud-speed').textContent = c.speed = v.speed;

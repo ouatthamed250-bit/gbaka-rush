@@ -28,8 +28,9 @@ for (const id of ['over-retry', 'over-menu', 'pause-resume', 'pause-end', 'level
   assert.ok(htmlIds.has(id), `bouton manquant : ${id}`);
 }
 
-// Le HUD doit afficher l'objectif du niveau (passagers) et les compteurs de la course.
-for (const id of ['hud-goal', 'hud-goal-pill', 'hud-pax', 'hud-money', 'hud-damage']) {
+// Le HUD doit afficher l'objectif du niveau (passagers) et les compteurs de la course,
+// ainsi que la commune et le quartier du secteur joué.
+for (const id of ['hud-goal', 'hud-goal-pill', 'hud-pax', 'hud-money', 'hud-damage', 'hud-commune', 'hud-quartier']) {
   assert.ok(htmlIds.has(id), `élément de HUD manquant : ${id}`);
 }
 

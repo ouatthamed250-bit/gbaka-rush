@@ -10,7 +10,12 @@ import { DISTRICTS } from '../config.js';
 
 export const DISTRICT_IDS = ['ville', 'marche', 'quartier', 'pont'];
 
-export function* districtPlan(rand = Math.random) {
+// `mix` = les ambiances d'un secteur (SECTORS[i].mix). Par défaut, le mélange global
+// d'Abidjan (DISTRICTS), qui contient tous les décors. Un secteur sans pont met pont: 0 :
+// la lagune n'apparaît alors jamais dans ce niveau.
+export function* districtPlan(rand = Math.random, mix = DISTRICTS) {
+  const total = mix.villeRun + mix.marche + mix.quartier + mix.pont;
+  const pont = mix.pont > 0;
   let last = 'ville';
   let queue = [];
   for (;;) {
@@ -20,14 +25,15 @@ export function* districtPlan(rand = Math.random) {
     } else if (last !== 'ville') {
       d = 'ville'; // on respire une rue « normale » après un quartier spécial
     } else {
-      const r = rand();
-      const a = DISTRICTS.villeRun;
-      const b = a + DISTRICTS.marche;
-      const c = b + DISTRICTS.quartier;
+      const r = rand() * total; // tirage normalisé : un secteur peut avoir ses propres poids
+      const a = mix.villeRun;
+      const b = a + mix.marche;
+      const c = b + mix.quartier;
       if (r < a) d = 'ville';
-      else if (r < b) { d = 'marche'; queue = repeat('marche', DISTRICTS.specialLength); }
-      else if (r < c) { d = 'quartier'; queue = repeat('quartier', DISTRICTS.specialLength); }
-      else { d = 'pont'; queue = repeat('pont', DISTRICTS.bridgeLength); }
+      else if (r < b) { d = 'marche'; queue = repeat('marche', mix.specialLength); }
+      else if (r < c) { d = 'quartier'; queue = repeat('quartier', mix.specialLength); }
+      else if (pont) { d = 'pont'; queue = repeat('pont', mix.bridgeLength); }
+      else d = 'ville';
     }
     last = d;
     yield d;

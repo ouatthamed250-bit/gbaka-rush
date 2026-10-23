@@ -159,12 +159,58 @@ function testLastLevel() {
   console.log('OK  dernier niveau : course libre débloquée, plus d’objectif.');
 }
 
+function testSectorsInGame() {
+  const g = Object.create(Game.prototype);
+  const calls = [];
+  g.z = -500;
+  g.world = { setSector: (s) => calls.push(`world:${s.id}`), applyEnvironment() {} };
+  g.people = { setSector: (s) => calls.push(`people:${s.id}`) };
+  g.traffic = { setSector: (s) => calls.push(`traffic:${s.id}`) };
+  g.ui = { setPlace: (c, q) => calls.push(`ui:${c}:${q}`) };
+  let apprentice = {
+    setSector: (s) => calls.push(`app:${s.id}`),
+    setQuartier: (q) => calls.push(`quartier:${q}`),
+  };
+  g.gbaka = { apprenti: apprentice };
+  g.sun = { position: { set() {} }, color: { set() {} }, intensity: 0 };
+  g.hemi = { color: { set() {} }, groundColor: { set() {} }, intensity: 0 };
+
+  // Niveau 2 = Adjamé : le décor, la foule, le trafic et l'apprenti suivent la commune.
+  const sector = g._useSector(1);
+  assert.equal(sector.name, 'Adjamé');
+  assert.equal(g.sector.id, 'adjame');
+  assert.equal(g.quartier, 'Liberté', 'premier quartier du secteur');
+  assert.equal(g.stopIndex, 0);
+  assert.ok(calls.includes('world:adjame'), 'décor de la commune appliqué');
+  assert.ok(calls.includes('people:adjame'), 'foule de la commune appliquée');
+  assert.ok(calls.includes('traffic:adjame'), 'taxis-motos de la commune appliqués');
+  assert.ok(calls.includes('app:adjame'), 'l’apprenti connaît la commune');
+  assert.ok(calls.includes('quartier:Liberté'), 'l’apprenti connaît le quartier');
+  assert.ok(calls.includes('ui:Adjamé:Liberté'), 'le HUD affiche commune · quartier');
+
+  // Peinture changée ou modèle 3D chargé : le gbaka recrée son apprenti. Il doit retrouver
+  // la commune et le quartier en cours (sinon il crierait des destinations d'une autre commune).
+  const fresh = { setSector: (s) => calls.push(`app2:${s.id}`), setQuartier: (q) => calls.push(`q2:${q}`) };
+  g.gbaka.apprenti = fresh;
+  g._syncApprenti();
+  assert.ok(calls.includes('app2:adjame'), 'nouvel apprenti remis dans la commune');
+  assert.ok(calls.includes('q2:Liberté'), 'nouvel apprenti remis dans le quartier');
+
+  // Le dernier niveau est Cocody : aucun mélange avec Yopougon.
+  g._useSector(LEVELS.length - 1);
+  assert.equal(g.sector.name, 'Cocody');
+  assert.ok(calls.includes('world:cocody'));
+  assert.ok(!calls.includes('world:yopougon'), 'aucun appel au décor d’une autre commune');
+  console.log('OK  secteurs en jeu : décor, foule, motos, HUD et apprenti changent avec le niveau.');
+}
+
 try {
   console.log('--- Parcours d’un niveau ---');
   testGoalOnHud();
   testLevelWin();
   testLevelFail();
   testLastLevel();
+  testSectorsInGame();
   console.log('\nTous les tests du parcours passent.');
 } catch (err) {
   console.error(`\nECHEC : ${err.message}`);

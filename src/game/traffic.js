@@ -141,6 +141,8 @@ export class Traffic {
     this.cars = [];
     this.maxActive = count; // plafond de véhicules actifs (réduit en qualité éco)
     this.eco = false;
+    this.motos = true; // les taxis-motos circulent-elles dans la commune ?
+    this.motoShare = 0.3;
     for (let i = 0; i < count; i++) {
       const type = TYPES[i % TYPES.length];
       const b = BUILDERS[type]();
@@ -148,6 +150,20 @@ export class Traffic {
       mesh.visible = false;
       scene.add(mesh);
       this.cars.push({ mesh, w: b.w, l: b.l, type, x: 0, z: -9999, speed: 0, baseSpeed: 0, active: false, phase: Math.random() * 6 });
+    }
+  }
+
+  // Commune jouée : les taxis-motos circulent à Yopougon, Adjamé et Treichville ; au Plateau
+  // et à Cocody, elles restent au garage (et les motos déjà en piste sortent de la route).
+  setSector(sector) {
+    this.motos = sector?.motos !== false;
+    this.motoShare = this.motos ? 0.3 : 0;
+    if (this.motos) return;
+    for (const c of this.cars) {
+      if (c.type === 'moto' && c.active) {
+        c.active = false;
+        c.mesh.visible = false;
+      }
     }
   }
 
@@ -222,7 +238,11 @@ export class Traffic {
     // Une seule apparition par image : cela évite les paquets de voitures qui surgissent
     // ensemble et garantit qu'après chaque apparition il reste toujours une voie libre.
     if (active < target) {
-      const c = this.cars.find((q) => !q.active);
+      // La commune décide de la part de taxis-motos dans le flux.
+      const free = this.cars.filter((q) => !q.active && (this.motos || q.type !== 'moto'));
+      let c = null;
+      if (this.motos && free.length && Math.random() < this.motoShare) c = free.find((q) => q.type === 'moto');
+      if (!c) c = free.find((q) => q.type !== 'moto') || free[0];
       if (c && this._spawn(c, playerZ, level)) active++;
     }
   }
