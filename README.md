@@ -5,6 +5,9 @@ Jeu mobile 3D ivoirien : tu conduis un gbaka dans les rues d'Abidjan, avec **un 
 
 État : **prototype jouable** (modèles provisoires en boîtes). Le but de ce dépôt est de continuer à le construire.
 
+- Dépôt : https://github.com/ouatthamed250-bit/gbaka-rush
+- À chaque envoi sur `main`, GitHub lance `npm test` puis `npm run build` (`.github/workflows/tests.yml`).
+
 ## Installer et lancer (VS Code)
 
 1. Installe **Node.js 20 ou plus** (https://nodejs.org, version LTS) et **VS Code**.
