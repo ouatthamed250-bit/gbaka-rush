@@ -1,0 +1,20 @@
+GBAKA RUSH - DOSSIER D'IMAGES (22/10/2026)
+
+01_Gbaka_base_VALIDE      : gbaka de base (planche + 4 vues decoupees). A GARDER comme modele.
+02_Peintures_skins        : peintures du gbaka (01 Maestro pour l'instant, a corriger, voir ci-dessous).
+03_Autres_vehicules       : taxi, camionnette, moto (low-poly Gemini) + planche illustree ChatGPT (reference seulement).
+04_Logo_et_interfaces     : logo, palette, ecrans (ChatGPT). Palette et police a garder, logo a redessiner.
+05_Photos_reference       : vraies photos de gbakas (reference de forme et de peinture, NE PAS publier dans le jeu).
+06_Jeu_reference_captures : captures du jeu d'un autre createur (reference d'ambiance, NE PAS copier).
+07_A_REFAIRE              : ancienne version du gbaka, mauvaise forme. Ne pas utiliser.
+
+PEINTURE MAESTRO
+- V2 (Grok) = la bonne : meme forme que le gbaka de base, texte sans crochets, visage invente.
+- V1 (Gemini) rangee dans ancienne_version_v1_Gemini : ne pas utiliser.
+- Ces images sont des DESSINS DE REFERENCE, pas encore des textures de jeu : il faudra les plaquer sur le modele 3D.
+- Dans la V2 cote, la porte coulissante est dessinee OUVERTE (interieur gris). A refaire avec la porte FERMEE pour la texture (la porte ouverte sera geree dans le modele 3D).
+
+PEINTURE L'ELEPHANT
+- Arriere : fait (Grok), dans 02_Peintures_skins/02_Elephant.
+- Cote : A FAIRE (limite Grok atteinte). Demander la meme peinture, porte fermee.
+- Verifier l'orthographe de L'ELEPHANT sur l'image (un L en trop possible).

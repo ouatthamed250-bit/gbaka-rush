@@ -1,0 +1,7 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "Lancer le jeu (dev)", "type": "npm", "script": "dev", "isBackground": true, "problemMatcher": [] },
+    { "label": "Construire (build)", "type": "npm", "script": "build", "problemMatcher": [] }
+  ]
+}

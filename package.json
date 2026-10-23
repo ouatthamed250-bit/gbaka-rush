@@ -1,0 +1,20 @@
+{
+  "name": "gbaka-rush",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Gbaka Rush - jeu mobile 3D ivoirien (Abidjan). Vertical, un seul doigt.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview --host",
+    "test": "node tests/simulate.mjs && node tests/model.mjs && node tests/world.mjs && node tests/levels.mjs && node tests/ui.mjs && node tests/game-flow.mjs"
+  },
+  "dependencies": {
+    "@fontsource/montserrat": "^5.1.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
+  }
+}
