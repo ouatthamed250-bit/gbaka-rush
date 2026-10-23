@@ -6,6 +6,7 @@ Jeu mobile 3D ivoirien : tu conduis un gbaka dans les rues d'Abidjan, avec **un 
 État : **prototype jouable** (modèles provisoires en boîtes). Le but de ce dépôt est de continuer à le construire.
 
 - Dépôt : https://github.com/ouatthamed250-bit/gbaka-rush
+- Jeu en ligne : **https://gbaka-rush-eight.vercel.app** (déploiement automatique à chaque envoi sur `main`).
 - À chaque envoi sur `main`, GitHub lance `npm test` puis `npm run build` (`.github/workflows/tests.yml`).
 
 ## Installer et lancer (VS Code)
